@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#302b63">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tracker">
+
+<!-- PWA Manifest (inline) -->
+<link rel="manifest" href='data:application/manifest+json,{"name":"Tracker Psikolog Klinis","short_name":"Tracker","start_url":"./tracker.html","display":"standalone","orientation":"portrait","background_color":"%230f0c29","theme_color":"%23302b63","icons":[{"src":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjMyIiBmaWxsPSIjMzAyYjYzIi8+PHRleHQgeD0iOTYiIHk9IjEyMCIgZm9udC1zaXplPSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+OlzwvdGV4dD48L3N2Zz4=","sizes":"192x192","type":"image/svg+xml","purpose":"any maskable"}]}'>
+
+<title>Tracker Psikolog Klinis</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: radial-gradient(circle at 20% 20%, #1a1a2e, #0f0f1e 60%, #000);
+    min-height: 100vh; color: #fff; padding: 20px 12px;
+    overscroll-behavior: none;
+  }
+  .poster {
+    max-width: 1300px; margin: 0 auto;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    border-radius: 20px; padding: 24px 16px;
+    box-shadow: 0 0 80px rgba(120, 80, 255, 0.4), 0 0 120px rgba(255, 100, 200, 0.2);
+  }
+  h1.title {
+    text-align: center; font-size: 26px;
+    background: linear-gradient(90deg, #ff6ec7, #ffd93d, #6ee7ff);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px; margin-bottom: 6px; text-transform: uppercase;
+  }
+  .subtitle {
+    text-align: center; color: #b8b8d1; font-size: 11px;
+    letter-spacing: 2px; margin-bottom: 20px;
+  }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 700px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 16px; padding: 14px;
+    transition: transform .3s; position: relative;
+  }
+  .card:not(.expanded):not(.highlight) { cursor: pointer; }
+  .card:not(.expanded):not(.highlight):active { transform: scale(0.98); }
+  .card.expanded { grid-column: 1 / -1; }
+  .card-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px; padding-bottom: 10px;
+    border-bottom: 2px solid rgba(255,255,255,0.1);
+  }
+  .icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .card h2 { font-size: 13px; letter-spacing: 1px; text-transform: uppercase; flex: 1; }
+  .expand-hint { font-size: 10px; color: #8888a8; }
+  .card.expanded .expand-hint { display: none; }
+  .card-body { display: none; }
+  .card.expanded .card-body { display: block; }
+  .card ul.roadmap { list-style: none; }
+  .card ul.roadmap li {
+    font-size: 12px; line-height: 1.5; padding: 5px 0;
+    color: #d8d8ea; display: flex; gap: 6px;
+  }
+  .year { font-weight: 700; flex-shrink: 0; font-size: 11px; min-width: 68px; }
+  .c1 .icon { background: linear-gradient(135deg, #ff6b6b, #ee5a6f); }
+  .c1 h2, .c1 .year { color: #ff9a9e; }
+  .c2 .icon { background: linear-gradient(135deg, #4ecdc4, #44a3aa); }
+  .c2 h2, .c2 .year { color: #6ee7ff; }
+  .c3 .icon { background: linear-gradient(135deg, #ffd93d, #f6b93b); }
+  .c3 h2, .c3 .year { color: #ffd93d; }
+  .c4 .icon { background: linear-gradient(135deg, #9b59ff, #6c5ce7); }
+  .c4 h2, .c4 .year { color: #b8a4ff; }
+  .c5 .icon { background: linear-gradient(135deg, #ff6ec7, #e84393); }
+  .c5 h2, .c5 .year { color: #ff9edb; }
+  .c6 .icon { background: linear-gradient(135deg, #10b981, #059669); }
+  .c6 h2, .c6 .year { color: #6ee7b7; }
+  .highlight {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, rgba(255,60,100,0.15), rgba(255,180,60,0.15));
+    border: 2px solid rgba(255, 100, 150, 0.6);
+  }
+  .highlight .icon { background: linear-gradient(135deg, #ff3c64, #ff8c42); }
+  .highlight h2 { color: #ff5577; font-size: 15px; letter-spacing: 2px; }
+  .highlight ul {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 8px; list-style: none; margin-top: 8px;
+  }
+  @media (min-width: 600px) { .highlight ul { grid-template-columns: repeat(5, 1fr); } }
+  .highlight ul li {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255, 100, 150, 0.4);
+    border-radius: 10px; padding: 8px;
+    text-align: center; font-size: 11px; font-weight: 600;
+  }
+  .dot {
+    display: block; width: 8px; height: 8px; border-radius: 50%;
+    background: #ff3c64; box-shadow: 0 0 12px #ff3c64; margin: 0 auto 4px;
+  }
+  .section-title {
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    color: #ff9a9e; margin: 16px 0 10px;
+    padding-bottom: 5px; border-bottom: 1px dashed rgba(255, 154, 158, 0.4);
+  }
+  .section-title.green { color: #6ee7b7; border-color: rgba(110, 231, 183, 0.4); }
+
+  /* TODAY PANEL */
+  .today-panel {
+    background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(78,205,196,0.08));
+    border: 2px solid rgba(16,185,129,0.4);
+    border-radius: 14px; padding: 14px; margin-bottom: 16px;
+  }
+  .today-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
+  .today-label { font-size: 11px; letter-spacing: 2px; color: #6ee7b7; text-transform: uppercase; font-weight: 700; }
+  .today-date { font-size: 11px; color: #b8b8d1; }
+  .start-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: linear-gradient(135deg, rgba(255,217,61,0.25), rgba(246,185,59,0.15));
+    border: 1px solid rgba(255,217,61,0.6);
+    color: #ffd93d; padding: 3px 10px;
+    border-radius: 20px; font-size: 10px;
+    font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .date-control {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,217,61,0.3);
+    border-radius: 10px; padding: 10px; margin-bottom: 12px;
+  }
+  .date-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .date-row label {
+    font-size: 10px; color: #ffd93d; letter-spacing: 1px;
+    text-transform: uppercase; font-weight: 700;
+  }
+  .date-input, .day-select {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; padding: 7px 10px;
+    border-radius: 8px; font-size: 12px;
+    font-family: inherit; cursor: pointer;
+  }
+  .date-input { color-scheme: dark; }
+  .day-select option { background: #1a1a2e; color: #fff; }
+  .today-jump {
+    background: linear-gradient(135deg, rgba(255,217,61,0.25), rgba(246,185,59,0.15));
+    border: 1px solid rgba(255,217,61,0.6);
+    color: #ffd93d; padding: 7px 12px;
+    border-radius: 8px; font-size: 11px;
+    font-weight: 700; letter-spacing: 1px; cursor: pointer;
+    text-transform: uppercase;
+  }
+  .date-info {
+    font-size: 10px; color: #b8b8d1;
+    margin-top: 6px; display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .date-info .info-chip {
+    background: rgba(255,255,255,0.06);
+    padding: 2px 8px; border-radius: 5px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .date-info .info-chip.start {
+    background: rgba(255,217,61,0.15);
+    border-color: rgba(255,217,61,0.5);
+    color: #ffd93d; font-weight: 700;
+  }
+
+  .today-tasks { display: flex; flex-direction: column; gap: 6px; }
+  .today-task {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(0,0,0,0.2); border-radius: 8px;
+    padding: 9px 11px; font-size: 12px; color: #e8e8ff;
+    border-left: 3px solid #10b981; cursor: pointer;
+  }
+  .today-task.done { opacity: 0.5; }
+  .today-task.done .task-text { text-decoration: line-through; }
+  .today-task input[type="checkbox"] {
+    width: 20px; height: 20px; accent-color: #10b981; cursor: pointer; flex-shrink: 0;
+  }
+  .today-icon { font-size: 16px; }
+  .task-text { flex: 1; min-width: 0; }
+  .task-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .mini-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #fff; width: 28px; height: 28px;
+    border-radius: 6px; cursor: pointer;
+    font-size: 14px; display: flex;
+    align-items: center; justify-content: center;
+    transition: all .2s;
+  }
+  .mini-btn:hover, .mini-btn:active {
+    background: rgba(110, 231, 183, 0.3);
+    border-color: #6ee7b7;
+  }
+
+  /* HABIT TABLE */
+  .habit-tracker { overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
+  .habit-table { width: 100%; border-collapse: separate; border-spacing: 4px; min-width: 680px; }
+  .habit-table th {
+    background: rgba(16, 185, 129, 0.15); color: #6ee7b7;
+    padding: 8px 4px; font-size: 10px; letter-spacing: 1px;
+    text-transform: uppercase; border-radius: 6px; text-align: center;
+  }
+  .habit-table th.habit-name { text-align: left; min-width: 200px; padding-left: 10px; }
+  .habit-table td {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px; padding: 6px; text-align: center;
+  }
+  .habit-table td.habit-cell { text-align: left; padding: 8px 12px; }
+  .habit-table td.today-col {
+    background: rgba(255, 217, 61, 0.08) !important;
+    border: 1px solid rgba(255, 217, 61, 0.4) !important;
+  }
+  .habit-table th.today-col-header {
+    background: rgba(255, 217, 61, 0.2) !important;
+    color: #ffd93d !important;
+  }
+  .habit-table td.before-start, .habit-table th.before-start-header {
+    opacity: 0.35;
+    background: rgba(0,0,0,0.3) !important;
+  }
+  .habit-name-text { display: block; font-size: 12px; font-weight: 700; color: #e8e8ff; }
+  .habit-reward-badge {
+    display: inline-block; padding: 2px 6px; margin-top: 3px;
+    background: rgba(16, 185, 129, 0.2); color: #6ee7b7;
+    border-radius: 5px; font-size: 9px; font-weight: 600;
+  }
+  .habit-desc { display: block; font-size: 9px; color: #8888a8; margin-top: 2px; }
+  .habit-cb { width: 28px; height: 28px; accent-color: #10b981; cursor: pointer; margin: 0; }
+  .habit-total { font-weight: 900; font-size: 14px; color: #6ee7b7; font-family: monospace; }
+  .habit-total.partial { color: #ffd93d; }
+  .habit-total.empty { color: #8888a8; }
+  .summary-row td {
+    background: rgba(110, 231, 183, 0.08) !important;
+    border: 1px solid rgba(110, 231, 183, 0.25) !important;
+    font-weight: 700; color: #6ee7b7;
+  }
+  .day-total { font-size: 12px; font-family: monospace; }
+  .day-total.full { color: #10b981; }
+  .grand-total {
+    font-size: 13px; font-family: monospace;
+    background: rgba(16,185,129,0.2) !important; color: #fff !important;
+  }
+
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+  .stat-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 10px 6px; text-align: center;
+  }
+  .stat-num { font-size: 20px; font-weight: 900; color: #6ee7b7; font-family: monospace; line-height: 1.2; }
+  .stat-label { font-size: 9px; letter-spacing: 1px; color: #8888a8; text-transform: uppercase; margin-top: 3px; }
+
+  .progress-wrap {
+    margin-top: 14px; background: rgba(0,0,0,0.3);
+    border-radius: 10px; padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .progress-label {
+    display: flex; justify-content: space-between; font-size: 11px;
+    letter-spacing: 1px; margin-bottom: 6px; color: #b8b8d1; text-transform: uppercase;
+  }
+  .progress-bar { height: 10px; background: rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden; }
+  .progress-fill {
+    height: 100%; width: 0%; border-radius: 8px; transition: width .4s ease;
+    background: linear-gradient(90deg, #10b981, #6ee7b7);
+  }
+
+  .punish-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+  @media (min-width: 600px) { .punish-grid { grid-template-columns: repeat(2, 1fr); } }
+  .punish-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255, 107, 107, 0.25);
+    border-left: 3px solid #ff6b6b;
+    border-radius: 8px; padding: 10px 12px;
+  }
+  .punish-card.safe {
+    border-left-color: #10b981; border-color: rgba(16, 185, 129, 0.25);
+    background: rgba(16, 185, 129, 0.05);
+  }
+  .punish-card.triggered {
+    border-left-color: #ff3c64; background: rgba(255, 60, 100, 0.1);
+  }
+  .punish-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .punish-title { font-size: 11px; font-weight: 700; color: #ff9a9e; letter-spacing: 1px; }
+  .punish-count { font-size: 12px; font-weight: 900; padding: 2px 8px; border-radius: 6px; font-family: monospace; }
+  .punish-count.safe { color: #6ee7b7; background: rgba(16,185,129,0.2); }
+  .punish-count.danger { color: #ff6b6b; background: rgba(255,60,100,0.25); }
+  .punish-desc { font-size: 10px; color: #b8b8d1; line-height: 1.4; }
+  .punish-status {
+    margin-top: 6px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 5px; display: inline-block;
+  }
+  .punish-status.safe { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+  .punish-status.danger { background: rgba(255,60,100,0.25); color: #ff6b6b; }
+
+  .reward-list { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+  @media (min-width: 600px) { .reward-list { grid-template-columns: repeat(3, 1fr); } }
+  .reward-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 10px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .reward-item.unlocked {
+    border-color: #10b981;
+    background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(78,205,196,0.1));
+  }
+  .reward-icon { font-size: 22px; }
+  .reward-name { font-size: 12px; font-weight: 700; color: #e8e8ff; }
+  .reward-cond { font-size: 10px; color: #b8b8d1; }
+  .reward-progress-text { font-size: 10px; font-weight: 700; color: #6ee7b7; margin-top: auto; }
+  .reward-progress-bar { height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+  .reward-progress-fill {
+    height: 100%; width: 0%; border-radius: 3px;
+    background: linear-gradient(90deg, #10b981, #6ee7b7); transition: width .4s ease;
+  }
+
+  .info-block {
+    background: rgba(255,255,255,0.03);
+    border-left: 3px solid #ff6b6b; border-radius: 6px;
+    padding: 10px 14px; margin-top: 10px;
+    font-size: 11px; line-height: 1.6; color: #d8d8ea;
+  }
+  .info-block.green { border-left-color: #10b981; }
+  .info-block strong { color: #ff9a9e; }
+  .info-block.green strong { color: #6ee7b7; }
+  .info-block ul { margin-left: 16px; margin-top: 5px; }
+  .info-block li { margin-bottom: 3px; }
+
+  .close-btn {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; width: 28px; height: 28px;
+    border-radius: 50%; cursor: pointer; font-size: 14px;
+    display: none; align-items: center; justify-content: center;
+  }
+  .card.expanded .close-btn { display: flex; }
+  .close-btn:active { background: #ff6b6b; }
+
+  /* ACTION BAR */
+  .action-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-top: 14px;
+  }
+  @media (min-width: 600px) { .action-bar { grid-template-columns: repeat(4, 1fr); } }
+  .action-btn {
+    padding: 10px 12px; border-radius: 10px;
+    font-size: 11px; letter-spacing: 1px;
+    text-transform: uppercase; font-weight: 700;
+    cursor: pointer; transition: all .2s;
+    border: 1px solid;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    min-height: 42px;
+  }
+  .action-btn:active { transform: scale(0.96); }
+  .action-btn.calendar {
+    background: rgba(66, 133, 244, 0.15);
+    border-color: rgba(66, 133, 244, 0.5);
+    color: #6ee7ff;
+  }
+  .action-btn.alarm {
+    background: rgba(255, 140, 66, 0.15);
+    border-color: rgba(255, 140, 66, 0.5);
+    color: #ff8c42;
+  }
+  .action-btn.notif {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.5);
+    color: #6ee7b7;
+  }
+  .action-btn.daily {
+    background: rgba(255, 211, 61, 0.15);
+    border-color: rgba(255, 211, 61, 0.5);
+    color: #ffd93d;
+  }
+  .action-btn.weekly {
+    background: rgba(255, 107, 107, 0.15);
+    border-color: rgba(255, 107, 107, 0.5);
+    color: #ff9a9e;
+  }
+
+  .footer { text-align: center; margin-top: 24px; font-size: 11px; color: #8888a8; letter-spacing: 2px; }
+  .footer strong { color: #ffd93d; }
+
+  /* MODAL */
+  .modal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85); z-index: 9998;
+    align-items: center; justify-content: center;
+    padding: 16px;
+  }
+  .modal.show { display: flex; }
+  .modal-box {
+    background: linear-gradient(135deg, #1a1a2e, #302b63);
+    border: 2px solid rgba(255,107,107,0.5);
+    border-radius: 16px; padding: 22px;
+    max-width: 400px; width: 100%; text-align: center;
+  }
+  .modal-box.daily { border-color: rgba(255,211,61,0.5); }
+  .modal-box.calendar { border-color: rgba(66,133,244,0.6); }
+  .modal-icon { font-size: 42px; margin-bottom: 10px; }
+  .modal-title {
+    color: #ff9a9e; font-size: 15px; margin-bottom: 8px;
+    letter-spacing: 1px; text-transform: uppercase; font-weight: 700;
+  }
+  .modal-box.daily .modal-title { color: #ffd93d; }
+  .modal-box.calendar .modal-title { color: #6ee7ff; }
+  .modal-desc { color: #b8b8d1; font-size: 12px; line-height: 1.5; margin-bottom: 18px; }
+  .modal-desc input, .modal-desc select {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; padding: 8px 10px;
+    border-radius: 6px; font-size: 12px;
+    font-family: inherit; width: 100%; margin-top: 8px;
+  }
+  .modal-actions { display: flex; gap: 10px; justify-content: center; }
+  .modal-btn {
+    padding: 10px 20px; border-radius: 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; border: none; text-transform: uppercase;
+  }
+  .modal-btn.cancel { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; }
+  .modal-btn.confirm {
+    background: linear-gradient(135deg, #ff3c64, #ff8c42);
+    color: #fff;
+  }
+  .modal-btn.confirm.daily { background: linear-gradient(135deg, #ffd93d, #f6b93b); color: #1a1a2e; }
+  .modal-btn.confirm.calendar { background: linear-gradient(135deg, #4285f4, #34a853); color: #fff; }
+
+  .toast {
+    position: fixed; top: 20px; left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    color: #fff; padding: 12px 22px;
+    border-radius: 10px; font-weight: 700;
+    font-size: 12px; letter-spacing: 1px;
+    z-index: 9999; opacity: 0;
+    transition: all .4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: none;
+    background: linear-gradient(135deg, #10b981, #059669);
+    max-width: 90vw; text-align: center;
+  }
+  .toast.daily { background: linear-gradient(135deg, #ffd93d, #f6b93b); color: #1a1a2e; }
+  .toast.calendar { background: linear-gradient(135deg, #4285f4, #34a853); }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="poster">
+  <h1 class="title">🎯 10 Tahun Menuju Psikolog Klinis</h1>
+  <p class="subtitle">MULAI BESOK 🚀 • AUTO-SAVE • CALENDAR + ALARM</p>
+
+  <div class="grid">
+    <div class="card c1" data-card>
+      <button class="close-btn" data-close type="button">✕</button>
+      <div class="card-header"><div class="icon">💪</div><h2>Fisik</h2><span class="expand-hint">👆</span></div>
+      <ul class="roadmap">
+        <li><span class="year">2026-27</span> Turun 25-30 kg</li>
+        <li><span class="year">2027-28</span> Turun 10-15 kg</li>
+        <li><span class="year">2028-30</span> Maintenance 75-80kg</li>
+        <li><span class="year">2030-36</span> Berat ideal</li>
+      </ul>
+    </div>
+
+    <div class="card c2" data-card>
+      <button class="close-btn" data-close type="button">✕</button>
+      <div class="card-header"><div class="icon">🌐</div><h2>B. Inggris</h2><span class="expand-hint">👆</span></div>
+      <ul class="roadmap">
+        <li><span class="year">2026-27</span> TOEFL 450-500</li>
+        <li><span class="year">2027-28</span> TOEFL 550+</li>
+        <li><span class="year">2028-30</span> Akademik S2</li>
+        <li><span class="year">2030-36</span> Jurnal internasional</li>
+      </ul>
+    </div>
+
+    <div class="card c3" data-card>
+      <button class="close-btn" data-close type="button">✕</button>
+      <div class="card-header"><div class="icon">💰</div><h2>Finansial</h2><span class="expand-hint">👆</span></div>
+      <ul class="roadmap">
+        <li><span class="year">2026-27</span> 5-7jt, darurat 3-5jt</li>
+        <li><span class="year">2027-28</span> 15-25jt + LPDP</li>
+        <li><span class="year">2028-30</span> S2 tercover</li>
+        <li><span class="year">2030-36</span> Investasi</li>
+      </ul>
+    </div>
+
+    <div class="card c4" data-card>
+      <button class="close-btn" data-close type="button">✕</button>
+      <div class="card-header"><div class="icon">🎓</div><h2>Akademik</h2><span class="expand-hint">👆</span></div>
+      <ul class="roadmap">
+        <li><span class="year">2026-27</span> UPP, riset kampus</li>
+        <li><span class="year">2027-28</span> S2 Profesi</li>
+        <li><span class="year">2028-30</span> PKPP/magang</li>
+        <li><span class="year">2030-31</span> STR, SIPPK</li>
+      </ul>
+    </div>
+
+    <div class="card c5" data-card>
+      <button class="close-btn" data-close type="button">✕</button>
+      <div class="card-header"><div class="icon">🏆</div><h2>Target</h2><span class="expand-hint">👆</span></div>
+      <ul class="roadmap">
+        <li><span class="year">2026-27</span> Lolos UPP</li>
+        <li><span class="year">2027-28</span> Diterima S2</li>
+        <li><span class="year">2028-30</span> Lulus + sumpah</li>
+        <li><span class="year">2030-36</span> Stabil</li>
+      </ul>
+    </div>
+
+    <div class="card c6" data-card>
+      <button class="close-btn" data-close type="button">✕</button>
+      <div class="card-header"><div class="icon">📊</div><h2>Tracking Harian</h2><span class="expand-hint">👆 Buka</span></div>
+      <ul class="roadmap">
+        <li><span class="year">Harian</span> 🎮 Game + 🍦 Dessert</li>
+        <li><span class="year">Mingguan</span> 🎮 Game + 🍔 Favorit</li>
+        <li><span class="year">Punish</span> 🧹 Bersih / 🚫 Puasa</li>
+      </ul>
+      <div class="card-body">
+        <div class="today-panel">
+          <div class="today-header">
+            <span class="today-label">🔥 HARI AKTIF</span>
+            <span id="startBadgeContainer"></span>
+            <span class="today-date" id="todayDate">—</span>
+          </div>
+          <div class="date-control">
+            <div class="date-row">
+              <label>📅</label>
+              <input type="date" id="datePicker" class="date-input" onchange="window.changeActiveDate(this.value)">
+              <label>Hari:</label>
+              <select id="daySelect" class="day-select" onchange="window.changeActiveDay(this.value)">
+                <option value="0">Senin</option>
+                <option value="1">Selasa</option>
+                <option value="2">Rabu</option>
+                <option value="3">Kamis</option>
+                <option value="4">Jumat</option>
+                <option value="5">Sabtu</option>
+                <option value="6">Minggu</option>
+              </select>
+              <button type="button" class="today-jump" onclick="window.jumpToStart()">🚀 Mulai</button>
+            </div>
+            <div class="date-info" id="dateInfo"></div>
+          </div>
+          <div class="today-tasks" id="todayTasks"></div>
+        </div>
+
+        <div class="section-title green">✅ Checklist Mingguan</div>
+        <div class="habit-tracker">
+          <table class="habit-table">
+            <thead><tr id="habitHeader"></tr></thead>
+            <tbody id="habitBody"></tbody>
+          </table>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-box"><div class="stat-num" id="statChecked">0</div><div class="stat-label">Selesai</div></div>
+          <div class="stat-box"><div class="stat-num" id="statStreak">0</div><div class="stat-label">🔥 Streak</div></div>
+          <div class="stat-box"><div class="stat-num" id="statFullDays">0</div><div class="stat-label">Hari Full</div></div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-label"><span>📊 Konsistensi</span><span id="rwProgressText">0 / 35</span></div>
+          <div class="progress-bar"><div class="progress-fill" id="rwProgressFill"></div></div>
+        </div>
+
+        <div class="section-title">⚠️ Punishment</div>
+        <div class="punish-grid" id="punishGrid"></div>
+
+        <div class="section-title green">🏆 Reward</div>
+        <div class="reward-list" id="rewardList"></div>
+
+        <!-- ACTION BAR -->
+        <div class="section-title green">⚡ Aksi Cepat</div>
+        <div class="action-bar">
+          <button class="action-btn calendar" type="button" onclick="window.openCalendarAll()">
+            📅 Kalender
+          </button>
+          <button class="action-btn alarm" type="button" onclick="window.openAlarmAll()">
+            ⏰ Alarm
+          </button>
+          <button class="action-btn notif" type="button" onclick="window.requestNotifPermission()">
+            🔔 Notifikasi
+          </button>
+          <button class="action-btn daily" type="button" onclick="window.resetDaily(event)">
+            🔄 Reset Hari
+          </button>
+        </div>
+        <div class="action-bar" style="margin-top:8px; grid-template-columns: 1fr;">
+          <button class="action-btn weekly" type="button" onclick="window.resetWeek(event)">
+            🔄 Reset Minggu Ini
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card highlight">
+      <div class="card-header"><div class="icon">🔥</div><h2>TAHUN INI (2026 — 2027)</h2></div>
+      <ul>
+        <li><span class="dot"></span> TOEFL 450-500</li>
+        <li><span class="dot"></span> Turun 25-30 kg</li>
+        <li><span class="dot"></span> Tabungan 5-7 juta</li>
+        <li><span class="dot"></span> Persiapan UPP</li>
+        <li><span class="dot"></span> Shortlist 3-5 kampus</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="footer">✨ <strong>FOKUS • DISIPLIN • KONSISTEN</strong> ✨</p>
+</div>
+
+<!-- MODAL RESET -->
+<div id="resetModal" class="modal">
+  <div class="modal-box" id="resetModalBox">
+    <div class="modal-icon" id="resetModalIcon">⚠️</div>
+    <h3 class="modal-title" id="resetModalTitle">Reset?</h3>
+    <p class="modal-desc" id="resetModalDesc">Data akan dihapus.</p>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" type="button" onclick="window.closeResetModal()">Batal</button>
+      <button class="modal-btn confirm" id="resetConfirmBtn" type="button" onclick="window.confirmReset()">Ya!</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CALENDAR -->
+<div id="calendarModal" class="modal">
+  <div class="modal-box calendar">
+    <div class="modal-icon">📅</div>
+    <h3 class="modal-title">Set Kalender & Alarm</h3>
+    <p class="modal-desc" style="text-align:left">
+      <label style="font-size:11px;color:#6ee7ff;">📌 Judul:</label>
+      <input type="text" id="calTitle" value="Tracker Psikolog — Rutinitas Harian">
+      <label style="font-size:11px;color:#6ee7ff;margin-top:10px;display:block;">⏰ Jam Mulai:</label>
+      <input type="time" id="calTime" value="05:00">
+      <label style="font-size:11px;color:#6ee7ff;margin-top:10px;display:block;">⏱️ Durasi (menit):</label>
+      <input type="number" id="calDuration" value="30" min="5" max="180">
+      <label style="font-size:11px;color:#6ee7ff;margin-top:10px;display:block;">🔔 Alarm (menit sebelum):</label>
+      <input type="number" id="calAlarm" value="5" min="0" max="60">
+    </p>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" type="button" onclick="window.closeCalendarModal()">Batal</button>
+      <button class="modal-btn confirm calendar" type="button" onclick="window.confirmCalendar()">Buka Google Calendar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ========== CONFIG ========== */
+var STORAGE_KEY = 'tracker_v10';
+var ACTIVE_DATE_KEY = 'tracker_active_date_v10';
+var START_DATE_KEY = 'tracker_start_date_v10';
+var NOTIF_KEY = 'tracker_notif_enabled_v10';
+var DAYS = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+var DAYS_FULL = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+
+var HABITS = [
+  { id: 'olahraga', icon: '🏃', name: 'Olahraga',
+    reward: '🎮 Game 30-45 mnt', threshold: 2, punish: 'Bersih rumah 30 menit',
+    time: '05:30',
+    daily: {
+      0: 'Low Impact Cardio (20-30 mnt)', 1: 'Bodyweight Exercise (20 mnt)',
+      2: 'Jalan Cepat + Stretching (30 mnt)', 3: 'Low Impact Cardio (20-30 mnt)',
+      4: 'Senam Aerobik Ringan (20 mnt)', 5: 'Olahraga Intensif (30-45 mnt)',
+      6: 'Rest Day / Stretching (15 mnt)' } },
+  { id: 'belajar', icon: '📚', name: 'Belajar',
+    reward: '🎮 Game 30 mnt', threshold: 3, punish: 'Cuci pakaian manual 30 menit',
+    time: '19:00',
+    daily: {
+      0: 'Structure TOEFL (30 mnt)', 1: 'Reading TOEFL (30 mnt)',
+      2: 'Jurnal klinis — baca 1 paper', 3: 'Structure TOEFL (30 mnt)',
+      4: 'Reading TOEFL (30 mnt)', 5: 'Latihan UPP (60 mnt)', 6: 'Review mingguan (30 mnt)' } },
+  { id: 'masak', icon: '🍳', name: 'Masak Bekal',
+    reward: '💰 Hemat + 🥗 Sehat', threshold: 3, punish: 'Masak bekal 3 hari + bersih dapur',
+    time: '17:00',
+    daily: {
+      0: 'Masak bekal besok', 1: 'Masak bekal besok', 2: 'Masak bekal besok',
+      3: 'Masak bekal besok', 4: 'Masak bekal besok',
+      5: 'Meal prep 2-3 hari', 6: 'Meal prep mingguan' } },
+  { id: 'makan', icon: '🥗', name: 'Makan Sehat',
+    reward: '🍦 Dessert <200 kkal', threshold: 3, punish: 'Puasa game 3 hari',
+    time: '07:00',
+    daily: {
+      0: 'Sarapan sehat', 1: 'Sarapan sehat', 2: 'Sarapan sehat',
+      3: 'Sarapan sehat', 4: 'Sarapan sehat',
+      5: 'Makan sehat (bebas 1x)', 6: 'Makan sehat (bebas 1x)' } },
+  { id: 'bersih', icon: '🧹', name: 'Bersih 5 mnt',
+    reward: '✨ Rumah rapi', threshold: 6, punish: 'Bersih besar 1-2 jam',
+    time: '21:00',
+    daily: {
+      0: 'Sapu kamar 5 mnt', 1: 'Rapikan meja 5 mnt',
+      2: 'Sapu kamar 5 mnt', 3: 'Rapikan meja 5 mnt',
+      4: 'Sapu kamar 5 mnt', 5: 'Bersih besar 30 mnt', 6: 'Bebas / rapikan' } }
+];
+
+/* ========== STATE ========== */
+var STATE = {};
+var RESET_MODE = null;
+var ACTIVE_DATE = null;
+var START_DATE = null;
+
+function toDateStr(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function parseDateStr(s) {
+  var p = s.split('-');
+  return new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
+}
+function getOrCreateStartDate() {
+  try { var s = localStorage.getItem(START_DATE_KEY); if (s) return parseDateStr(s); } catch(e){}
+  var t = new Date(); t.setDate(t.getDate()+1); t.setHours(0,0,0,0);
+  try { localStorage.setItem(START_DATE_KEY, toDateStr(t)); } catch(e){}
+  return t;
+}
+function loadActiveDate() {
+  try { var s = localStorage.getItem(ACTIVE_DATE_KEY); if (s) { ACTIVE_DATE = parseDateStr(s); return; } } catch(e){}
+  ACTIVE_DATE = new Date(START_DATE);
+}
+function saveActiveDate() { try { localStorage.setItem(ACTIVE_DATE_KEY, toDateStr(ACTIVE_DATE)); } catch(e){} }
+function loadStateFromStorage() {
+  try { var r = localStorage.getItem(STORAGE_KEY); STATE = r ? JSON.parse(r) : {}; } catch(e){ STATE = {}; }
+}
+function saveStateToStorage() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); } catch(e){} }
+function getWeekKey() {
+  var d = ACTIVE_DATE;
+  var day = d.getDay();
+  var diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  var mon = new Date(d.getFullYear(), d.getMonth(), diff);
+  return toDateStr(mon);
+}
+function getWeek() { var wk = getWeekKey(); if (!STATE[wk]) STATE[wk] = {}; return STATE[wk]; }
+function isChecked(id, day) { return getWeek()[id + '-' + day] === true; }
+function setChecked(id, day, val) {
+  var w = getWeek(); var k = id + '-' + day;
+  if (val) w[k] = true; else delete w[k];
+  saveStateToStorage();
+}
+function getActiveDayIdx() { var d = ACTIVE_DATE.getDay(); return d === 0 ? 6 : d - 1; }
+function getMondayOf(date) {
+  var d = new Date(date); var day = d.getDay();
+  var diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(d.getFullYear(), d.getMonth(), diff);
+}
+
+/* ========== TOAST ========== */
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast' + (type ? ' ' + type : '');
+  void t.offsetWidth;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
+/* ========== CARD TOGGLE ========== */
+document.addEventListener('click', function(e) {
+  if (e.target.closest('[data-close]')) {
+    e.stopPropagation();
+    var c = e.target.closest('[data-card]');
+    if (c) c.classList.remove('expanded');
+    return;
+  }
+  var card = e.target.closest('[data-card]');
+  if (!card) return;
+  if (e.target.closest('a, input, label, select, button, table, .today-panel, .date-control, .habit-tracker, .punish-grid, .reward-list, .info-block, .progress-wrap, .stats-row, .action-bar, .action-btn, .today-task, .modal, .toast')) return;
+  var isExp = card.classList.contains('expanded');
+  if (isExp) {
+    if (e.target.closest('.card-header')) card.classList.remove('expanded');
+  } else {
+    document.querySelectorAll('[data-card].expanded').forEach(function(c) { c.classList.remove('expanded'); });
+    card.classList.add('expanded');
+    setTimeout(function() { card.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+  }
+});
+
+/* ========== RENDER: DATE ========== */
+function renderDateControl() {
+  var dp = document.getElementById('datePicker');
+  var ds = document.getElementById('daySelect');
+  var di = document.getElementById('dateInfo');
+  var bc = document.getElementById('startBadgeContainer');
+  var activeIdx = getActiveDayIdx();
+  var isStart = toDateStr(ACTIVE_DATE) === toDateStr(START_DATE);
+  if (dp) dp.value = toDateStr(ACTIVE_DATE);
+  if (ds) ds.value = String(activeIdx);
+  if (bc) bc.innerHTML = isStart ? '<span class="start-badge">🚀 Mulai</span>' : '';
+  var mon = getMondayOf(ACTIVE_DATE);
+  var sun = new Date(mon); sun.setDate(sun.getDate()+6);
+  var fmt = function(d) { return d.toLocaleDateString('id-ID', { day:'numeric', month:'short' }); };
+  var sf = START_DATE.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+  var before = ACTIVE_DATE.getTime() < START_DATE.getTime();
+  if (di) di.innerHTML =
+    '<span class="info-chip start">🚀 ' + sf + '</span>' +
+    '<span class="info-chip">📅 ' + fmt(mon) + ' — ' + fmt(sun) + '</span>' +
+    (before ? '<span class="info-chip" style="color:#ff9a9e">⚠️ Sebelum mulai</span>' : '');
+}
+
+/* ========== RENDER: TODAY ========== */
+function renderToday() {
+  var c = document.getElementById('todayTasks');
+  var de = document.getElementById('todayDate');
+  if (!c) return;
+  var todayIdx = getActiveDayIdx();
+  var before = ACTIVE_DATE.getTime() < START_DATE.getTime();
+  if (de) de.textContent = ACTIVE_DATE.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'short' });
+  var html = '';
+  HABITS.forEach(function(h) {
+    var checked = isChecked(h.id, todayIdx);
+    html += '<div class="today-task ' + (checked ? 'done' : '') + '">' +
+      '<input type="checkbox" data-habit="' + h.id + '" data-day="' + todayIdx + '" ' + (checked ? 'checked' : '') + '>' +
+      '<span class="today-icon">' + h.icon + '</span>' +
+      '<span class="task-text"><strong>' + h.name + ':</strong> ' + h.daily[todayIdx] + '</span>' +
+      '<div class="task-actions">' +
+        '<button class="mini-btn" type="button" title="Ke Kalender" onclick="window.quickCalendar(\'' + h.id + '\')">📅</button>' +
+        '<button class="mini-btn" type="button" title="Set Alarm" onclick="window.quickAlarm(\'' + h.id + '\')">⏰</button>' +
+      '</div>' +
+      '</div>';
+  });
+  if (before) {
+    html = '<div style="padding:12px;text-align:center;color:#ff9a9e;background:rgba(255,60,100,0.1);border-radius:8px;font-size:11px;margin-bottom:8px;">⚠️ Sebelum hari mulai. Mulai: <b>' + START_DATE.toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) + '</b></div>' + html;
+  }
+  c.innerHTML = html;
+  c.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+    cb.addEventListener('change', onCheck);
+  });
+}
+
+/* ========== RENDER: TABLE ========== */
+function renderTable() {
+  var he = document.getElementById('habitHeader');
+  var be = document.getElementById('habitBody');
+  if (!he || !be) return;
+  var todayIdx = getActiveDayIdx();
+  var mon = getMondayOf(ACTIVE_DATE);
+  var startTime = START_DATE.getTime();
+  var dayDates = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(mon); d.setDate(mon.getDate() + i);
+    dayDates.push(d);
+  }
+  var hh = '<th class="habit-name">Kebiasaan</th>';
+  DAYS.forEach(function(d, i) {
+    var cls = (i === todayIdx) ? 'today-col-header' : (dayDates[i].getTime() < startTime ? 'before-start-header' : '');
+    hh += '<th' + (cls ? ' class="' + cls + '"' : '') + '>' + d + '</th>';
+  });
+  hh += '<th>Tot</th>';
+  he.innerHTML = hh;
+  var bh = '';
+  var grand = 0;
+  HABITS.forEach(function(h) {
+    var done = 0;
+    var cells = '';
+    DAYS.forEach(function(_, i) {
+      var checked = isChecked(h.id, i);
+      if (checked) done++;
+      var cls = (i === todayIdx) ? 'today-col' : (dayDates[i].getTime() < startTime ? 'before-start' : '');
+      cells += '<td' + (cls ? ' class="' + cls + '"' : '') + '><input type="checkbox" class="habit-cb" data-habit="' + h.id + '" data-day="' + i + '" ' + (checked ? 'checked' : '') + '></td>';
+    });
+    grand += done;
+    var tc = done === 0 ? 'empty' : (done === 7 ? '' : 'partial');
+    bh += '<tr><td class="habit-cell"><span class="habit-name-text">' + h.icon + ' ' + h.name + '</span><span class="habit-reward-badge">' + h.reward + '</span><span class="habit-desc">' + h.punish + '</span></td>' + cells + '<td class="habit-total ' + tc + '">' + done + '/7</td></tr>';
+  });
+  var sum = '';
+  var full = 0;
+  DAYS.forEach(function(_, i) {
+    var d = 0;
+    HABITS.forEach(function(h) { if (isChecked(h.id, i)) d++; });
+    var isF = d === HABITS.length;
+    if (isF) full++;
+    var cls = (i === todayIdx) ? 'today-col' : (dayDates[i].getTime() < startTime ? 'before-start' : '');
+    sum += '<td' + (cls ? ' class="' + cls + '"' : '') + '><span class="day-total ' + (isF ? 'full' : '') + '">' + d + '/5</span></td>';
+  });
+  bh += '<tr class="summary-row"><td class="habit-cell"><strong>📊 Total/Hari</strong></td>' + sum + '<td class="grand-total">' + grand + '/35</td></tr>';
+  be.innerHTML = bh;
+  be.querySelectorAll('.habit-cb').forEach(function(cb) {
+    cb.addEventListener('change', onCheck);
+  });
+  document.getElementById('statChecked').textContent = grand;
+  document.getElementById('statFullDays').textContent = full;
+  var streak = 0;
+  for (var i = todayIdx; i >= 0; i--) {
+    if (dayDates[i].getTime() < startTime) break;
+    var d = 0;
+    HABITS.forEach(function(h) { if (isChecked(h.id, i)) d++; });
+    if (d === HABITS.length) streak++; else break;
+  }
+  document.getElementById('statStreak').textContent = streak;
+  var pct = Math.round((grand / 35) * 100);
+  document.getElementById('rwProgressText').textContent = grand + ' / 35 (' + pct + '%)';
+  document.getElementById('rwProgressFill').style.width = pct + '%';
+}
+
+function onCheck(e) {
+  setChecked(e.target.dataset.habit, parseInt(e.target.dataset.day, 10), e.target.checked);
+  renderToday();
+  renderTable();
+  renderPunishment();
+  renderRewards();
+}
+
+/* ========== PUNISHMENT & REWARDS ========== */
+function renderPunishment() {
+  var g = document.getElementById('punishGrid');
+  if (!g) return;
+  var html = '';
+  HABITS.forEach(function(h) {
+    var done = 0;
+    DAYS.forEach(function(_, i) { if (isChecked(h.id, i)) done++; });
+    var skip = 7 - done;
+    var trig = skip > h.threshold;
+    html += '<div class="punish-card ' + (trig ? 'triggered' : 'safe') + '">' +
+      '<div class="punish-head"><span class="punish-title">' + h.icon + ' ' + h.name + '</span>' +
+      '<span class="punish-count ' + (trig ? 'danger' : 'safe') + '">' + skip + '/7</span></div>' +
+      '<div class="punish-desc">Skip >' + h.threshold + 'x → ' + h.punish + '</div>' +
+      '<div class="punish-status ' + (trig ? 'danger' : 'safe') + '">' + (trig ? '❌ PUNISHMENT' : '✅ Aman') + '</div></div>';
+  });
+  g.innerHTML = html;
+}
+
+function countHabit(id) {
+  var c = 0;
+  DAYS.forEach(function(_, i) { if (isChecked(id, i)) c++; });
+  return c;
+}
+
+function renderRewards() {
+  var l = document.getElementById('rewardList');
+  if (!l) return;
+  var cO = countHabit('olahraga'), cB = countHabit('belajar'),
+      cM = countHabit('makan'), cMk = countHabit('masak');
+  var rules = [
+    { icon: '🎮', name: 'Game 1-2 Jam', cond: 'Olahraga ≥5x + Belajar ≥6x', done: Math.min(cO, Math.floor(cB*5/6)), target: 5 },
+    { icon: '🍔', name: 'Makan Favorit', cond: 'Belajar ≥6x/minggu', done: cB, target: 6 },
+    { icon: '🎉', name: 'Game 2-3 Jam', cond: 'Makan ≥5x + Masak ≥5x', done: Math.min(cM, cMk), target: 5 }
+  ];
+  var h = '';
+  rules.forEach(function(r) {
+    var p = Math.min(100, Math.round((r.done / r.target) * 100));
+    var u = r.done >= r.target;
+    h += '<div class="reward-item ' + (u ? 'unlocked' : '') + '">' +
+      '<div class="reward-icon">' + r.icon + '</div>' +
+      '<div class="reward-name">' + r.name + '</div>' +
+      '<div class="reward-cond">' + r.cond + '</div>' +
+      '<div class="reward-progress-text">' + (u ? '✅ UNLOCKED!' : r.done + '/' + r.target + ' (' + p + '%)') + '</div>' +
+      '<div class="reward-progress-bar"><div class="reward-progress-fill" style="width:' + p + '%"></div></div></div>';
+  });
+  l.innerHTML = h;
+}
+
+function renderAll() {
+  renderDateControl();
+  renderToday();
+  renderTable();
+  renderPunishment();
+  renderRewards();
+}
+
+/* ========== DATE HANDLERS ========== */
+window.changeActiveDate = function(s) {
+  if (!s) return;
+  ACTIVE_DATE = parseDateStr(s); saveActiveDate(); renderAll();
+};
+window.changeActiveDay = function(idx) {
+  idx = parseInt(idx, 10);
+  var mon = getMondayOf(ACTIVE_DATE);
+  var nd = new Date(mon); nd.setDate(mon.getDate() + idx);
+  ACTIVE_DATE = nd; saveActiveDate(); renderAll();
+};
+window.jumpToStart = function() {
+  ACTIVE_DATE = new Date(START_DATE); saveActiveDate(); renderAll();
+  showToast('🚀 Ke hari mulai', 'daily');
+};
+
+/* ========== CALENDAR & ALARM ========== */
+function pad(n) { return String(n).padStart(2, '0'); }
+function fmtCalDate(d) {
+  return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00';
+}
+
+function buildCalendarUrl(habitId, dayIdx, customTime) {
+  var habit = HABITS.find(function(h) { return h.id === habitId; });
+  if (!habit) return null;
+
+  // Hitung tanggal untuk hari itu (dalam minggu aktif)
+  var mon = getMondayOf(ACTIVE_DATE);
+  var targetDate = new Date(mon); targetDate.setDate(mon.getDate() + dayIdx);
+
+  // Parse jam
+  var time = customTime || habit.time;
+  var parts = time.split(':');
+  var hours = parseInt(parts[0], 10);
+  var mins = parseInt(parts[1], 10);
+
+  var start = new Date(targetDate);
+  start.setHours(hours, mins, 0, 0);
+  var end = new Date(start.getTime() + 30 * 60000); // 30 menit
+
+  var title = encodeURIComponent('🚀 ' + habit.name + ' — Tracker Psikolog');
+  var details = encodeURIComponent(
+    habit.daily[dayIdx] + '\n\n' +
+    '💡 Reward: ' + habit.reward + '\n' +
+    '⚠️ Punishment: ' + habit.punish + '\n\n' +
+    'Dari: Tracker 10 Tahun Menuju Psikolog Klinis'
+  );
+  var dates = fmtCalDate(start) + '/' + fmtCalDate(end);
+
+  // RRULE: mingguan setiap hari yang sama (MO, TU, WE, TH, FR, SA, SU)
+  var dayMap = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
+  var rrule = 'RRULE:FREQ=WEEKLY;BYDAY=' + dayMap[dayIdx];
+
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+    '&text=' + title +
+    '&dates=' + dates +
+    '&details=' + details +
+    '&recur=' + encodeURIComponent(rrule) +
+    '&ctz=Asia/Jakarta';
+}
+
+function buildAlarmCalendarUrl(habitId, dayIdx, startTime, alarmMin) {
+  var url = buildCalendarUrl(habitId, dayIdx, startTime);
+  if (!url) return null;
+  // Tambah alarm (menit sebelum)
+  return url + '&alarm=' + (alarmMin || 5);
+}
+
+window.quickCalendar = function(habitId) {
+  var dayIdx = getActiveDayIdx();
+  var habit = HABITS.find(function(h) { return h.id === habitId; });
+  if (!habit) return;
+
+  // Buka modal kalender dengan preset
+  document.getElementById('calTitle').value = '🚀 ' + habit.name + ' — Tracker';
+  document.getElementById('calTime').value = habit.time;
+  document.getElementById('calDuration').value = 30;
+  document.getElementById('calAlarm').value = 5;
+  document.getElementById('calendarModal').dataset.habit = habitId;
+  document.getElementById('calendarModal').dataset.day = dayIdx;
+  document.getElementById('calendarModal').classList.add('show');
+};
+
+window.quickAlarm = function(habitId) {
+  var dayIdx = getActiveDayIdx();
+  var habit = HABITS.find(function(h) { return h.id === habitId; });
+  if (!habit) return;
+  // Alarm langsung tanpa modal
+  var url = buildAlarmCalendarUrl(habitId, dayIdx, habit.time, 5);
+  if (url) {
+    window.open(url, '_blank');
+    showToast('⏰ Buka Google Calendar untuk alarm...', 'calendar');
+  }
+};
+
+window.openCalendarAll = function() {
+  document.getElementById('calTitle').value = '🚀 Rutinitas Tracker Psikolog';
+  document.getElementById('calTime').value = '05:00';
+  document.getElementById('calDuration').value = 30;
+  document.getElementById('calAlarm').value = 5;
+  document.getElementById('calendarModal').dataset.habit = 'olahraga'; // default
+  document.getElementById('calendarModal').dataset.day = getActiveDayIdx();
+  document.getElementById('calendarModal').classList.add('show');
+};
+
+window.openAlarmAll = function() {
+  // Buat 5 alarm sekaligus (satu untuk tiap habit) - buka tab berurutan
+  var activeIdx = getActiveDayIdx();
+  var urls = [];
+  HABITS.forEach(function(h) {
+    var url = buildAlarmCalendarUrl(h.id, activeIdx, h.time, 5);
+    if (url) urls.push(url);
+  });
+  if (urls.length === 0) return;
+  if (confirm('Akan membuka ' + urls.length + ' tab Google Calendar (1 per kebiasaan).\n\nLanjutkan?')) {
+    urls.forEach(function(u, i) {
+      setTimeout(function() { window.open(u, '_blank'); }, i * 300);
+    });
+    showToast('⏰ Membuka ' + urls.length + ' alarm di Google Calendar', 'calendar');
+  }
+};
+
+window.confirmCalendar = function() {
+  var modal = document.getElementById('calendarModal');
+  var habitId = modal.dataset.habit;
+  var dayIdx = parseInt(modal.dataset.day, 10);
+  var title = document.getElementById('calTitle').value;
+  var time = document.getElementById('calTime').value;
+  var duration = parseInt(document.getElementById('calDuration').value, 10);
+  var alarmMin = parseInt(document.getElementById('calAlarm').value, 10);
+
+  var mon = getMondayOf(ACTIVE_DATE);
+  var targetDate = new Date(mon); targetDate.setDate(mon.getDate() + dayIdx);
+  var parts = time.split(':');
+  var start = new Date(targetDate);
+  start.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
+  var end = new Date(start.getTime() + duration * 60000);
+
+  var habit = HABITS.find(function(h) { return h.id === habitId; });
+  var details = habit ? (habit.daily[dayIdx] + '\n\n💡 ' + habit.reward + '\n⚠️ ' + habit.punish) : '';
+
+  var dayMap = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
+  var url = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+    '&text=' + encodeURIComponent(title) +
+    '&dates=' + fmtCalDate(start) + '/' + fmtCalDate(end) +
+    '&details=' + encodeURIComponent(details) +
+    '&recur=' + encodeURIComponent('RRULE:FREQ=WEEKLY;BYDAY=' + dayMap[dayIdx]) +
+    '&alarm=' + alarmMin +
+    '&ctz=Asia/Jakarta';
+
+  window.open(url, '_blank');
+  modal.classList.remove('show');
+  showToast('📅 Buka Google Calendar di tab baru...', 'calendar');
+};
+
+window.closeCalendarModal = function() {
+  document.getElementById('calendarModal').classList.remove('show');
+};
+
+/* ========== NOTIFIKASI ========== */
+window.requestNotifPermission = function() {
+  if (!('Notification' in window)) {
+    showToast('❌ Browser tidak support notifikasi');
+    return;
+  }
+  Notification.requestPermission().then(function(perm) {
+    if (perm === 'granted') {
+      try { localStorage.setItem(NOTIF_KEY, '1'); } catch(e){}
+      showToast('✅ Notifikasi aktif!');
+      new Notification('🔔 Tracker Aktif', {
+        body: 'Kamu akan dapat pengingat harian.',
+        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjMyIiBmaWxsPSIjMzAyYjYzIi8+PHRleHQgeD0iOTYiIHk9IjEyMCIgZm9udC1zaXplPSI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+OlzwvdGV4dD48L3N2Zz4='
+      });
+    } else {
+      showToast('❌ Notifikasi ditolak');
+    }
+  });
+};
+
+/* ========== RESET ========== */
+window.resetDaily = function(e) {
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+  RESET_MODE = 'daily';
+  var idx = getActiveDayIdx();
+  document.getElementById('resetModalBox').className = 'modal-box daily';
+  document.getElementById('resetModalIcon').textContent = '📅';
+  document.getElementById('resetModalTitle').textContent = 'Reset Hari ' + DAYS_FULL[idx] + '?';
+  document.getElementById('resetModalDesc').innerHTML = 'Checklist <b>' + DAYS_FULL[idx] + ', ' + ACTIVE_DATE.toLocaleDateString('id-ID', { day:'numeric', month:'short' }) + '</b> akan dikosongkan.';
+  var b = document.getElementById('resetConfirmBtn');
+  b.className = 'modal-btn confirm daily'; b.textContent = 'Ya, Reset!';
+  document.getElementById('resetModal').classList.add('show');
+};
+
+window.resetWeek = function(e) {
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+  RESET_MODE = 'weekly';
+  document.getElementById('resetModalBox').className = 'modal-box';
+  document.getElementById('resetModalIcon').textContent = '⚠️';
+  document.getElementById('resetModalTitle').textContent = 'Reset Minggu?';
+  document.getElementById('resetModalDesc').innerHTML = 'Semua checklist minggu ini akan dihapus.';
+  var b = document.getElementById('resetConfirmBtn');
+  b.className = 'modal-btn confirm'; b.textContent = 'Ya, Reset!';
+  document.getElementById('resetModal').classList.add('show');
+};
+
+window.closeResetModal = function() {
+  document.getElementById('resetModal').classList.remove('show');
+  RESET_MODE = null;
+};
+
+window.confirmReset = function() {
+  if (!RESET_MODE) return;
+  var wk = getWeekKey();
+  if (RESET_MODE === 'daily') {
+    var idx = getActiveDayIdx();
+    HABITS.forEach(function(h) {
+      var k = h.id + '-' + idx;
+      if (STATE[wk] && STATE[wk][k]) delete STATE[wk][k];
+    });
+    saveStateToStorage();
+    document.getElementById('resetModal').classList.remove('show');
+    RESET_MODE = null;
+    renderAll();
+    showToast('✅ Hari ' + DAYS_FULL[idx] + ' direset', 'daily');
+  } else {
+    delete STATE[wk]; saveStateToStorage();
+    document.getElementById('resetModal').classList.remove('show');
+    RESET_MODE = null;
+    renderAll();
+    showToast('✅ Minggu direset');
+  }
+};
+
+document.addEventListener('click', function(e) {
+  var m = document.getElementById('resetModal');
+  if (m && e.target === m) window.closeResetModal();
+  var c = document.getElementById('calendarModal');
+  if (c && e.target === c) window.closeCalendarModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    window.closeResetModal();
+    window.closeCalendarModal();
+  }
+});
+
+/* ========== SERVICE WORKER (Offline Support) ========== */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    var swCode = 'self.addEventListener("install",function(e){self.skipWaiting()});' +
+      'self.addEventListener("activate",function(e){e.waitUntil(self.clients.claim())});' +
+      'self.addEventListener("fetch",function(e){e.respondWith(caches.open("v10").then(function(c){return c.match(e.request).then(function(r){return r||fetch(e.request).then(function(res){if(e.request.method==="GET"&&res.ok){c.put(e.request,res.clone())}return res})})}))});';
+    var blob = new Blob([swCode], { type: 'application/javascript' });
+    var swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl).then(function() {
+      console.log('[PWA] Service Worker registered (offline mode ready)');
+    }).catch(function(e) {
+      console.log('[PWA] SW registration skipped:', e.message);
+    });
+  });
+}
+
+/* ========== INIT ========== */
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('[INIT] V10 — Windows + Android + Calendar + Alarm');
+  loadStateFromStorage();
+  START_DATE = getOrCreateStartDate();
+  loadActiveDate();
+  console.log('[INIT] START:', toDateStr(START_DATE), '| ACTIVE:', toDateStr(ACTIVE_DATE));
+  renderAll();
+
+  // Cek apakah PWA standalone (aplikasi terinstall)
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                     window.navigator.standalone === true;
+  if (isStandalone) {
+    console.log('[PWA] Berjalan sebagai aplikasi');
+  }
+});
+</script>
+</body>
+</html>
